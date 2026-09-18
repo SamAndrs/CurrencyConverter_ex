@@ -24,5 +24,35 @@ namespace CurrencyConverter_ex
         {
             InitializeComponent();
         }
+
+        private void convert_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Convert button clicked!");
+        }
+
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Clear button clicked!");
+        }
+
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Save button clicked!");
+        }
+
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Cancel button clicked!");
+        }
+
+        private void dgvCurrency_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+
+        }
     }
 }
