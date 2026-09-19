@@ -7,11 +7,12 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
         Title="Currency Converter" SizeToContent="WidthAndHeight"
-        WindowStartupLocation="CenterScreen" Icon="/Images/money.png">
+        WindowStartupLocation="CenterScreen" Icon="/Images/money.png"
+        Background="Black">
 
-    <TabControl Name="tbMain" TabStripPlacement="Top">
+    <TabControl Name="tbMain" TabStripPlacement="Top" Background="Black">
         <!-- TAB 1 CURRENCY CONVERTER CONTROLS -->
-        <TabItem Name="tbConverter" Header="Currency Converter">
+        <TabItem Name="tbConverter" Header="Currency Converter" Background="Gray">
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -26,7 +27,8 @@
                     <Border.BorderBrush>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                             <GradientStop Color="#ec2075" Offset="0.0"/>
-                            <GradientStop Color="#f33944" Offset="0.50"/>
+                            <GradientStop Color="#F02D5D" Offset="0.25"/>
+                            <GradientStop Color="#F33944" Offset="0.50"/>
                         </LinearGradientBrush>
                     </Border.BorderBrush>
 
@@ -34,7 +36,8 @@
                         <Rectangle.Fill>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="#ec2075" Offset="0.0"/>
-                                <GradientStop Color="#f33944" Offset="0.50"/>
+                                <GradientStop Color="#F02D5D" Offset="0.25"/>
+                                <GradientStop Color="#F33944" Offset="0.50"/>
                             </LinearGradientBrush>
                         </Rectangle.Fill>
                     </Rectangle>
@@ -44,14 +47,14 @@
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center"
                     Height="50" Width="1000" VerticalAlignment="Center">
                     <Label Height="50" Width="1000" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                   Content="Currency Converter" FontSize="25" Foreground="#ec2075" FontWeight="Bold">
+                   Content="Currency Converter" FontSize="25" Foreground="#EC2075" FontWeight="Bold">
                     </Label>
                 </StackPanel>
 
                 <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center" 
                     Height="80" Width="1000">
                     <Label Height="40" Width="1000" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-                Content="Converted Currency" FontSize="20">
+                Content="Converted Currency" FontSize="20" Foreground="White">
                     </Label>
 
                     <Label Name="lblCurrency" Height="40" Width="1000" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
@@ -101,7 +104,8 @@
                         <Button.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="#ec2075" Offset="0.0"/>
-                                <GradientStop Color="#f33944" Offset="0.5"/>
+                                <GradientStop Color="#F02D5D" Offset="0.25"/>
+                                <GradientStop Color="#F33944" Offset="0.50"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
@@ -111,7 +115,8 @@
                         <Button.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="#ec2075" Offset="0.0"/>
-                                <GradientStop Color="#f33944" Offset="0.5"/>
+                                <GradientStop Color="#F02D5D" Offset="0.25"/>
+                                <GradientStop Color="#F33944" Offset="0.50"/>
                             </LinearGradientBrush>
                         </Button.Background>
                     </Button>
@@ -215,7 +220,7 @@
                     <DataGrid Name="dgvCurrency" AutoGenerateColumns="False" Height="180" Margin="10" Width="480"
                               Background="Transparent" CanUserAddRows="False" 
                               SelectedCellsChanged="dgvCurrency_SelectedCellsChanged" SelectionUnit="Cell"
-                              VerticalScrollBarVisibility="Auto"> 
+                              VerticalScrollBarVisibility="Auto" Foreground="White"> 
                         <DataGrid.Columns>
                             <DataGridTextColumn x:Name="Id" Header="Id" Width="100" CanUserResize="False"
                                                 Visibility="Hidden" Binding="{Binding Path=Id}"/>
