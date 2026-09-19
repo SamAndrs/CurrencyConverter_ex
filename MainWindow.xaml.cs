@@ -26,6 +26,7 @@ namespace CurrencyConverter_ex
         {
             InitializeComponent();
             BindCurrency();
+            //GetData();
         }
 
         public void dbConnect()
@@ -99,8 +100,109 @@ namespace CurrencyConverter_ex
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Save button clicked!");
-        }
+            try
+            {
+                // If textamount is null or empty
+                if(txtAmount.Text == null || txtAmount.Text.Trim() == "")
+                {
+                    MessageBox.Show("Please enter amount", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    txtAmount.Focus();
+                    return;
+                }
+                else if (txtCurrencyName.Text == null || txtCurrencyName.Text.Trim() == "")
+                {
+                    MessageBox.Show("Please enter currency name", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    txtCurrencyName.Focus();
+                    return;
+                }
+                else
+                {
+                    if(_currencyId > 0) // Code for update button.
+                    {
+                        if (MessageBox.Show("Update information?", "Information", MessageBoxButton.YesNo, 
+                            MessageBoxImage.Question) == MessageBoxResult.Yes) // Show confirmation message
+                        {
+                            // If confirmation message is yes, run code.
+                            dbConnect();
+                            DataTable dTable = new DataTable();
+                            sqlCmd = new SqlCommand("UPDATE Currency_Master SET Amount = @Amount, CurrencyName = @CurrencyName WHERE Id = @Id", sqlCon); // Update the datatable row
+                            sqlCmd.CommandType = CommandType.Text;
+                            sqlCmd.Parameters.AddWithValue("@Id", _currencyId);
+                            sqlCmd.Parameters.AddWithValue("@Amount", txtAmount.Text.Trim());
+                            sqlCmd.Parameters.AddWithValue("@CurrencyName", txtCurrencyName.Text.Trim());
+                            sqlCmd.ExecuteNonQuery(); // Execute the query
+                            sqlCon.Close(); // Close the connection
+
+                            MessageBox.Show("Information updated successfully", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        
+                    }
+                    else // Save new currency button code
+                    {
+                        if (MessageBox.Show("Save information?", "Information", MessageBoxButton.YesNo, 
+                            MessageBoxImage.Question) == MessageBoxResult.Yes) // Show confirmation message
+                        {
+                            // If confirmation message is yes, run code.
+                            dbConnect();
+                            sqlCmd = new SqlCommand("INSERT INTO Currency_Master(Amount, CurrencyName) VALUES(@Amount, @CurrencyName)", sqlCon); // Save the datatable row
+                            sqlCmd.CommandType = CommandType.Text;
+                            sqlCmd.Parameters.AddWithValue("@Amount", txtAmount.Text.Trim());
+                            sqlCmd.Parameters.AddWithValue("@CurrencyName", txtCurrencyName.Text.Trim());
+                            sqlCmd.ExecuteNonQuery(); // Execute the query
+                            sqlCon.Close(); // Close the connection
+
+                            MessageBox.Show("Data saved successfully", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                    // Clear user input data
+                    ClearMaster();
+                }
+                    
+
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }// End
+
+        private void ClearMaster()
+        {
+            try
+            {
+                txtAmount.Text = string.Empty;
+                txtCurrencyName.Text = string.Empty;
+                btnSave.Content = "Save";
+                GetData();
+                _currencyId = 0;
+                BindCurrency();
+                txtAmount.Focus();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+        }// End
+
+        private void GetData() // Bind data to DataGrid view.
+        {
+            dbConnect();
+            DataTable dTable = new DataTable();
+            sqlCmd = new SqlCommand("SELECT * FROM Currency_Master", sqlCon);
+            sqlCmd.CommandType = CommandType.Text;
+            sqlDa = new SqlDataAdapter(sqlCmd);
+            sqlDa.Fill(dTable);
+
+            if (dTable != null && dTable.Rows.Count > 0)
+                dgvCurrency.ItemsSource = dTable.DefaultView;
+            
+            else
+                dgvCurrency.ItemsSource = null;
+
+            sqlCon.Close();
+
+        }// End
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
