@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -26,7 +27,8 @@ namespace CurrencyConverter_ex
         {
             InitializeComponent();
             BindCurrency();
-            //GetData();
+            GetData();
+            lblCurrency.Content = "0";
         }
 
         public void dbConnect()
@@ -85,18 +87,88 @@ namespace CurrencyConverter_ex
 
         private void convert_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Convert button clicked!");
-        }
+            //Declare ConvertedValue variable with double data type to store converted currency value
+            double ConvertedValue;
+
+            try
+            {
+               
+                //Check amount textbox is Null or Blank
+                if (txtCurrency.Text == null || txtCurrency.Text.Trim() == "")
+                {
+                    //If amount Textbox is Null or Blank then show dialog box
+                    MessageBox.Show("Please enter amount", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    //Set focus to amount textbox
+                    txtCurrency.Focus();
+                    return;
+                }
+                //If From currency selected value is null or default text as --SELECT--
+                else if (cmbFromCurrency.SelectedValue == null || cmbFromCurrency.SelectedIndex == 0)
+                {
+                    //Open Dialog box
+                    MessageBox.Show("Please select 'From Currency'", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    cmbFromCurrency.Focus();
+                    return;
+                }
+                else if (cmbToCurrency.SelectedValue == null || cmbToCurrency.SelectedIndex == 0)
+                {
+                    MessageBox.Show("Please select 'To Currency'", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    cmbToCurrency.Focus();
+                    return;
+                }
+
+                if (cmbFromCurrency.SelectedValue == cmbToCurrency.SelectedValue) //Check if From and To Combobox Selected Same Value
+                {
+                    //Amount textbox value is set in ConvertedValue. The double.parse is used to change Datatype from String To Double. 
+                    //Textbox text has string, and ConvertedValue is double.
+                    ConvertedValue = double.Parse(txtCurrency.Text);
+
+                    //Show the label converted currency name and converted currency amount. The ToString("N3") is used for Placing 000 after the dot(.)
+                    lblCurrency.Content = cmbToCurrency.Text + " " + ConvertedValue.ToString("N3");
+                }
+                else
+                {
+
+                    //Calculation for currency converter is From currency value Multiplied(*) with amount textbox value and then that total is divided(/) with To currency value.
+                    ConvertedValue = (double.Parse(cmbFromCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text)) / double.Parse(cmbToCurrency.SelectedValue.ToString());
+
+                    //Show the label converted currency name and converted currency amount.
+                    lblCurrency.Content = cmbToCurrency.Text + " " + ConvertedValue.ToString("N3");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }// End
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Clear button clicked!");
+            // Clear and reset ComboBoxes in currency converter section.
+            try
+            {
+                txtCurrency.Text = string.Empty;
+                if (cmbFromCurrency.Items.Count > 0)
+                    cmbFromCurrency.SelectedIndex = 0;
+
+                if (cmbToCurrency.Items.Count > 0)
+                    cmbToCurrency.SelectedIndex = 0;
+
+                lblCurrency.Content = "";
+                txtCurrency.Focus();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = true;
-        }
+           Regex regex = new Regex("[^0-9]+"); // Regular expression to allow only numbers
+            e.Handled = regex.IsMatch(e.Text); // If input is not a number, mark the event as handled
+        }// End
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
@@ -206,12 +278,62 @@ namespace CurrencyConverter_ex
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Cancel button clicked!");
-        }
+            try
+            {
+                ClearMaster();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }// End
 
         private void dgvCurrency_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
+            try
+            {
+                DataGrid dGrid = (DataGrid)sender;      // Create object for DataGrid
+                DataRowView selectedRow = dGrid.SelectedItem as DataRowView;   // Create object for DataRowView
 
+                if (selectedRow != null) // selected row is NOT null
+                {
+                    if (dgvCurrency.Items.Count > 0) // DataGrid view HAS rows
+                    {
+                        if (dGrid.SelectedCells.Count > 0) // selected row HAS cells
+                        {
+                            _currencyId = Int32.Parse(selectedRow["Id"].ToString()); // Get selected row Id column
+
+                            if (dGrid.SelectedCells[0].Column.DisplayIndex == 0) // If selected cell is in first column (Edit icon button cell)
+                            {
+                                txtAmount.Text = selectedRow["Amount"].ToString(); // Get selected row Amount column
+                                txtCurrencyName.Text = selectedRow["CurrencyName"].ToString(); // Get selected row CurrencyName column
+                                btnSave.Content = "Update"; // Change button text to 'Update'
+                            }
+                            if (dGrid.SelectedCells[0].Column.DisplayIndex == 1) // If selected cell is in second column (Delete icon button cell)
+                            {
+                                if (MessageBox.Show("Delete information?", "Information", MessageBoxButton.YesNo,
+                                    MessageBoxImage.Question) == MessageBoxResult.Yes) // Show confirmation message
+                                {
+                                    dbConnect();
+                                    sqlCmd = new SqlCommand("DELETE FROM Currency_Master WHERE Id = @Id", sqlCon); // Delete the datatable row
+                                    sqlCmd.CommandType = CommandType.Text;
+                                    sqlCmd.Parameters.AddWithValue("@Id", _currencyId);
+                                    sqlCmd.ExecuteNonQuery(); // Execute the query
+                                    sqlCon.Close(); // Close the connection
+
+                                    MessageBox.Show("Information deleted successfully", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                                    ClearMaster();
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
