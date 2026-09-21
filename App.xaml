@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:CurrencyConverter_ex"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        
         <Style x:Key="ButtonRound" TargetType="Button">
             <Setter Property="Template">
                 <Setter.Value>
